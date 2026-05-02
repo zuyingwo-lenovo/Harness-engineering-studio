@@ -807,7 +807,7 @@ function Field({ label, value, onChange, placeholder }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400"
+        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 placeholder:text-slate-400"
       />
     </label>
   );
@@ -822,7 +822,7 @@ function Area({ label, value, onChange, placeholder, rows = 4 }) {
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         placeholder={placeholder}
-        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400"
+        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 placeholder:text-slate-400"
       />
     </label>
   );
@@ -835,7 +835,7 @@ function SelectField({ label, value, onChange, options }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400"
+        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -988,12 +988,12 @@ export default function HarnessEngineeringStudio() {
 
   const harnessGroupsCovered = unique(selectedHarness.map((item) => item.group)).length;
   const harnessGroupTotal = unique(harnessPatterns.map((item) => item.group)).length;
-  const harnessCoverage = harnessGroupsCovered / harnessGroupTotal;
+  const harnessCoverage = Math.round((harnessGroupsCovered / harnessGroupTotal) * 100);
 
   const requiredInputFields = [input.problem, input.desiredOutcome, input.stakeholders, input.constraints];
-  const inputCompleteness = requiredInputFields.filter((item) => item.trim().length > 0).length / requiredInputFields.length;
-  const routineCoverage = skillPatterns.filter((item) => item.core && selectedSkillIds.includes(item.id)).length /
-    skillPatterns.filter((item) => item.core).length;
+  const inputCompleteness = Math.round((requiredInputFields.filter((item) => item.trim().length > 0).length / requiredInputFields.length) * 100);
+  const routineCoverage = Math.round((skillPatterns.filter((item) => item.core && selectedSkillIds.includes(item.id)).length /
+    skillPatterns.filter((item) => item.core).length) * 100);
 
   const blockers = [];
   if (!input.problem.trim()) blockers.push(t("blockerProblem"));
@@ -1053,6 +1053,16 @@ export default function HarnessEngineeringStudio() {
     setBundleOutOfDate(false);
   }
 
+  function loadExample() {
+    const recs = getRecommendations(sampleInput);
+    setInput({ ...sampleInput });
+    setSelectedSkillIds(recs.skillIds);
+    setSelectedHarnessIds(recs.harnessIds);
+    setArtifacts(generateArtifacts(sampleInput, recs.skillIds, recs.harnessIds, language));
+    setBundleOutOfDate(false);
+    setActiveTab("routine");
+  }
+
   function updateArtifact(file, value) {
     setArtifacts((prev) => ({ ...prev, [file]: value }));
   }
@@ -1077,10 +1087,24 @@ export default function HarnessEngineeringStudio() {
               {t("ideLabel")}
             </div>
             <button
-              onClick={() => setInput(sampleInput)}
+              onClick={loadExample}
               className="rounded-full bg-white px-5 py-2 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
             >
               {t("loadExample")}
+            </button>
+            <button
+              onClick={() => downloadTextFile("artifact_bundle.md", markdownBundle)}
+              className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            >
+              <FileText className="h-4 w-4 text-slate-500" />
+              {t("downloadMarkdown")}
+            </button>
+            <button
+              onClick={() => downloadTextFile("artifact_bundle.json", bundleString)}
+              className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+            >
+              <Download className="h-4 w-4 text-slate-500" />
+              {t("downloadJSON")}
             </button>
             <button
               onClick={applyRecommendation}
