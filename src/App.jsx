@@ -85,6 +85,38 @@ const translations = {
     badgeCore: "core",
     badgeOptional: "optional",
     recommendedForInput: "Recommended for the current input",
+    downloadMarkdown: "Download MD Bundle",
+    downloadJSON: "Download JSON Bundle",
+    archMultiActor: "Planner → Generator → Evaluator → Handoff",
+    archEvidence: "Evidence-driven task loop",
+    archLean: "Lean single-loop routine",
+    blockerProblem: "Problem statement",
+    blockerOutcome: "Desired outcome",
+    blockerStakeholders: "Stakeholders",
+    blockerConstraints: "Constraints",
+    blockerSensor: "Evaluation sensor",
+    blockerHandoff: "Handoff skill",
+    groupState: "State",
+    groupContext: "Context",
+    groupOrchestration: "Orchestration",
+    groupTools: "Tools",
+    groupObservability: "Observability",
+    groupEvaluation: "Evaluation",
+    groupMemory: "Memory",
+    groupGovernance: "Governance",
+    levelLow: "low",
+    levelMedium: "medium",
+    levelHigh: "high",
+    compSingle: "single-step",
+    compMultiStep: "multi-step",
+    compMultiActor: "multi-actor",
+    toolWeb: "web",
+    toolFiles: "files",
+    toolDocs: "docs",
+    toolSpreadsheets: "spreadsheets",
+    toolSlides: "slides",
+    toolCode: "code",
+    toolApi: "api",
   },
   zh: {
     title: "问题解决代理工作室",
@@ -151,6 +183,38 @@ const translations = {
     badgeCore: "核心",
     badgeOptional: "可选",
     recommendedForInput: "针对当前输入的推荐",
+    downloadMarkdown: "下载 MD 包",
+    downloadJSON: "下载 JSON 包",
+    archMultiActor: "策划者 → 生成者 → 评估者 → 交接",
+    archEvidence: "证据驱动的任务循环",
+    archLean: "精益单循环流程",
+    blockerProblem: "问题陈述",
+    blockerOutcome: "期望成果",
+    blockerStakeholders: "相关人员",
+    blockerConstraints: "约束",
+    blockerSensor: "评估传感器",
+    blockerHandoff: "交接技能",
+    groupState: "状态",
+    groupContext: "上下文",
+    groupOrchestration: "编排",
+    groupTools: "工具",
+    groupObservability: "可观测性",
+    groupEvaluation: "评估",
+    groupMemory: "存储",
+    groupGovernance: "治理",
+    levelLow: "低",
+    levelMedium: "中",
+    levelHigh: "高",
+    compSingle: "单步",
+    compMultiStep: "多步",
+    compMultiActor: "多角色",
+    toolWeb: "网页",
+    toolFiles: "文件",
+    toolDocs: "文档",
+    toolSpreadsheets: "电子表格",
+    toolSlides: "幻灯片",
+    toolCode: "代码",
+    toolApi: "API",
   },
   ja: {
     title: "Problem-Solving Agent Studio",
@@ -217,6 +281,38 @@ const translations = {
     badgeCore: "core",
     badgeOptional: "optional",
     recommendedForInput: "Recommended for the current input",
+    downloadMarkdown: "MD Bundle をダウンロード",
+    downloadJSON: "JSON Bundle をダウンロード",
+    archMultiActor: "Planner → Generator → Evaluator → Handoff",
+    archEvidence: "証拠駆動型タスクループ",
+    archLean: "リーン・シングルループ",
+    blockerProblem: "問題定義",
+    blockerOutcome: "期待成果",
+    blockerStakeholders: "関係者",
+    blockerConstraints: "制約条件",
+    blockerSensor: "評価センサ",
+    blockerHandoff: "引き継ぎスキル",
+    groupState: "State",
+    groupContext: "Context",
+    groupOrchestration: "Orchestration",
+    groupTools: "Tools",
+    groupObservability: "Observability",
+    groupEvaluation: "Evaluation",
+    groupMemory: "Memory",
+    groupGovernance: "Governance",
+    levelLow: "low",
+    levelMedium: "medium",
+    levelHigh: "high",
+    compSingle: "single-step",
+    compMultiStep: "multi-step",
+    compMultiActor: "multi-actor",
+    toolWeb: "web",
+    toolFiles: "files",
+    toolDocs: "docs",
+    toolSpreadsheets: "spreadsheets",
+    toolSlides: "slides",
+    toolCode: "code",
+    toolApi: "api",
   },
 };
 
@@ -767,7 +863,7 @@ function TogglePill({ active, children, onClick }) {
   );
 }
 
-function PatternCard({ title, subtitle, desc, selected, recommended, onToggle, badge }) {
+function PatternCard({ title, subtitle, desc, selected, recommended, onToggle, badge, recommendedLabel }) {
   return (
     <button
       onClick={onToggle}
@@ -800,7 +896,7 @@ function PatternCard({ title, subtitle, desc, selected, recommended, onToggle, b
       <p className={cx("mt-3 text-sm leading-6", selected ? "text-slate-200" : "text-slate-600")}>{desc}</p>
       {recommended ? (
         <div className={cx("mt-3 text-xs font-medium", selected ? "text-slate-100" : "text-slate-700")}>
-          Recommended for the current input
+          {recommendedLabel}
         </div>
       ) : null}
     </button>
@@ -900,19 +996,19 @@ export default function HarnessEngineeringStudio() {
     skillPatterns.filter((item) => item.core).length;
 
   const blockers = [];
-  if (!input.problem.trim()) blockers.push("Problem statement");
-  if (!input.desiredOutcome.trim()) blockers.push("Desired outcome");
-  if (!input.stakeholders.trim()) blockers.push("Stakeholders");
-  if (!input.constraints.trim()) blockers.push("Constraints");
-  if (!selectedHarnessIds.includes("sensor-pipeline")) blockers.push("Evaluation sensor");
-  if (!selectedSkillIds.includes("handoff")) blockers.push("Handoff skill");
+  if (!input.problem.trim()) blockers.push(t("blockerProblem"));
+  if (!input.desiredOutcome.trim()) blockers.push(t("blockerOutcome"));
+  if (!input.stakeholders.trim()) blockers.push(t("blockerStakeholders"));
+  if (!input.constraints.trim()) blockers.push(t("blockerConstraints"));
+  if (!selectedHarnessIds.includes("sensor-pipeline")) blockers.push(t("blockerSensor"));
+  if (!selectedSkillIds.includes("handoff")) blockers.push(t("blockerHandoff"));
 
   const architectureLabel =
     input.complexity === "multi-actor"
-      ? "Planner → Generator → Evaluator → Handoff"
+      ? t("archMultiActor")
       : input.evidenceNeed === "high"
-      ? "Evidence-driven task loop"
-      : "Lean single-loop routine";
+      ? t("archEvidence")
+      : t("archLean");
 
   const bundleString = JSON.stringify(artifacts, null, 2);
   const markdownBundle = bundleMarkdown(artifacts);
@@ -981,7 +1077,7 @@ export default function HarnessEngineeringStudio() {
               {t("ideLabel")}
             </div>
             <button
-              onClick={() => setInput(defaultInput)}
+              onClick={() => setInput(sampleInput)}
               className="rounded-full bg-white px-5 py-2 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
             >
               {t("loadExample")}
@@ -1080,9 +1176,9 @@ export default function HarnessEngineeringStudio() {
                       value={input.evidenceNeed}
                       onChange={(v) => updateInput("evidenceNeed", v)}
                       options={[
-                        { value: "low", label: "low" },
-                        { value: "medium", label: "medium" },
-                        { value: "high", label: "high" },
+                        { value: "low", label: t("levelLow") },
+                        { value: "medium", label: t("levelMedium") },
+                        { value: "high", label: t("levelHigh") },
                       ]}
                     />
                     <SelectField
@@ -1090,9 +1186,9 @@ export default function HarnessEngineeringStudio() {
                       value={input.riskLevel}
                       onChange={(v) => updateInput("riskLevel", v)}
                       options={[
-                        { value: "low", label: "low" },
-                        { value: "medium", label: "medium" },
-                        { value: "high", label: "high" },
+                        { value: "low", label: t("levelLow") },
+                        { value: "medium", label: t("levelMedium") },
+                        { value: "high", label: t("levelHigh") },
                       ]}
                     />
                   </div>
@@ -1103,9 +1199,9 @@ export default function HarnessEngineeringStudio() {
                       value={input.complexity}
                       onChange={(v) => updateInput("complexity", v)}
                       options={[
-                        { value: "single-step", label: "single-step" },
-                        { value: "multi-step", label: "multi-step" },
-                        { value: "multi-actor", label: "multi-actor" },
+                        { value: "single-step", label: t("compSingle") },
+                        { value: "multi-step", label: t("compMultiStep") },
+                        { value: "multi-actor", label: t("compMultiActor") },
                       ]}
                     />
                   </div>
@@ -1124,7 +1220,7 @@ export default function HarnessEngineeringStudio() {
                             updateInput("availableTools", next);
                           }}
                         >
-                          {tool}
+                          {t(`tool${tool.charAt(0).toUpperCase() + tool.slice(1)}`)}
                         </TogglePill>
                       ))}
                     </div>
@@ -1228,6 +1324,7 @@ export default function HarnessEngineeringStudio() {
                             desc={`${pattern.desc[language] || pattern.desc["en"]} Output: ${pattern.output.join(", ")}`}
                             selected={selectedSkillIds.includes(pattern.id)}
                             recommended={recommendation.skillIds.includes(pattern.id)}
+                            recommendedLabel={t("recommendedForInput")}
                             onToggle={() => toggleSkill(pattern.id)}
                             badge={pattern.core ? t("badgeCore") : t("badgeOptional")}
                           />
@@ -1267,6 +1364,7 @@ export default function HarnessEngineeringStudio() {
                               desc={pattern.desc[language] || pattern.desc["en"]}
                               selected={selectedSkillIds.includes(pattern.id)}
                               recommended={recommendation.skillIds.includes(pattern.id)}
+                              recommendedLabel={t("recommendedForInput")}
                               onToggle={() => toggleSkill(pattern.id)}
                               badge={pattern.core ? t("badgeCore") : t("badgeOptional")}
                             />
@@ -1281,12 +1379,13 @@ export default function HarnessEngineeringStudio() {
                             <PatternCard
                               key={pattern.id}
                               title={pattern.label[language] || pattern.label["en"]}
-                              subtitle={pattern.group}
+                              subtitle={t(`group${pattern.group}`)}
                               desc={pattern.desc[language] || pattern.desc["en"]}
                               selected={selectedHarnessIds.includes(pattern.id)}
                               recommended={recommendation.harnessIds.includes(pattern.id)}
+                              recommendedLabel={t("recommendedForInput")}
                               onToggle={() => toggleHarness(pattern.id)}
-                              badge={pattern.group}
+                              badge={t(`group${pattern.group}`)}
                             />
                           ))}
                         </div>
@@ -1319,12 +1418,28 @@ export default function HarnessEngineeringStudio() {
                             <div className="text-sm font-semibold text-slate-900">{artifactTab}</div>
                             <div className="text-xs text-slate-500">{t("artifactNote")}</div>
                           </div>
-                          <button
-                            onClick={regenerateArtifacts}
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400"
-                          >
-                            {t("regenerateThisBundle")}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => downloadTextFile("artifact_bundle.md", markdownBundle)}
+                              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400"
+                            >
+                              <FileText className="h-4 w-4" />
+                              {t("downloadMarkdown")}
+                            </button>
+                            <button
+                              onClick={() => downloadTextFile("artifact_bundle.json", bundleString)}
+                              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400"
+                            >
+                              <Download className="h-4 w-4" />
+                              {t("downloadJSON")}
+                            </button>
+                            <button
+                              onClick={regenerateArtifacts}
+                              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-slate-400"
+                            >
+                              {t("regenerateThisBundle")}
+                            </button>
+                          </div>
                         </div>
                         <textarea
                           value={artifacts[artifactTab] || ""}
@@ -1374,8 +1489,10 @@ export default function HarnessEngineeringStudio() {
                           <div className="mt-4 space-y-3">
                             {selectedHarness.map((item) => (
                               <div key={item.id} className="rounded-2xl border border-slate-200 p-3">
-                                <div className="text-sm font-semibold text-slate-900">{item.label[language] || item.label["en"]}</div>
-                                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{item.group}</div>
+                                <div className="mt-1 text-sm font-semibold text-slate-900">{item.label[language] || item.label["en"]}</div>
+                                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                                  {t(`group${item.group}`)}
+                                </div>
                                 <div className="mt-2 text-sm text-slate-600">{item.desc[language] || item.desc["en"]}</div>
                               </div>
                             ))}
