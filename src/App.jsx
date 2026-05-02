@@ -117,6 +117,12 @@ const translations = {
     toolSlides: "slides",
     toolCode: "code",
     toolApi: "api",
+    historyTitle: "Saved Designs",
+    saveDesign: "Save Current Design",
+    deleteRecord: "Delete",
+    loadRecord: "Load",
+    noHistory: "No saved designs yet",
+    designSaved: "Design saved to history",
   },
   zh: {
     title: "问题解决代理工作室",
@@ -215,6 +221,12 @@ const translations = {
     toolSlides: "幻灯片",
     toolCode: "代码",
     toolApi: "API",
+    historyTitle: "保存的方案",
+    saveDesign: "保存当前方案",
+    deleteRecord: "删除",
+    loadRecord: "加载",
+    noHistory: "尚无保存的方案",
+    designSaved: "方案已保存到历史记录",
   },
   ja: {
     title: "Problem-Solving Agent Studio",
@@ -313,6 +325,12 @@ const translations = {
     toolSlides: "slides",
     toolCode: "code",
     toolApi: "api",
+    historyTitle: "保存済み設計",
+    saveDesign: "現在の設計を保存",
+    deleteRecord: "削除",
+    loadRecord: "読込",
+    noHistory: "保存された設計はありません",
+    designSaved: "履歴に保存されました",
   },
 };
 
@@ -959,12 +977,20 @@ export default function HarnessEngineeringStudio() {
   const [selectedSkillIds, setSelectedSkillIds] = useState(initialRecommendation.skillIds);
   const [selectedHarnessIds, setSelectedHarnessIds] = useState(initialRecommendation.harnessIds);
   const [activeTab, setActiveTab] = useState("routine");
+  const [sidebarTab, setSidebarTab] = useState("input");
   const [artifactTab, setArtifactTab] = useState("brief.md");
   const [patternQuery, setPatternQuery] = useState("");
   const [bundleOutOfDate, setBundleOutOfDate] = useState(true);
   const [artifacts, setArtifacts] = useState(() =>
     generateArtifacts(defaultInput, initialRecommendation.skillIds, initialRecommendation.harnessIds, language)
   );
+  const [history, setHistory] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("harness_history") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
   const t = (key) => translations[language][key] || key;
 
@@ -1063,6 +1089,37 @@ export default function HarnessEngineeringStudio() {
     setActiveTab("routine");
   }
 
+  function saveToHistory() {
+    const newItem = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      name: input.projectName || "Untitled Design",
+      input,
+      selectedSkillIds,
+      selectedHarnessIds,
+      language
+    };
+    const nextHistory = [newItem, ...history];
+    setHistory(nextHistory);
+    localStorage.setItem("harness_history", JSON.stringify(nextHistory));
+    setSidebarTab("history");
+  }
+
+  function loadFromHistory(item) {
+    setInput(item.input);
+    setSelectedSkillIds(item.selectedSkillIds);
+    setSelectedHarnessIds(item.selectedHarnessIds);
+    setLanguage(item.language || language);
+    setArtifacts(generateArtifacts(item.input, item.selectedSkillIds, item.selectedHarnessIds, item.language || language));
+    setBundleOutOfDate(false);
+  }
+
+  function deleteFromHistory(id) {
+    const nextHistory = history.filter(item => item.id !== id);
+    setHistory(nextHistory);
+    localStorage.setItem("harness_history", JSON.stringify(nextHistory));
+  }
+
   function updateArtifact(file, value) {
     setArtifacts((prev) => ({ ...prev, [file]: value }));
   }
@@ -1146,11 +1203,49 @@ export default function HarnessEngineeringStudio() {
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
           <div className="xl:col-span-4">
             <div className="sticky top-8 space-y-6">
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-6">
-                  <h2 className="text-lg font-bold text-slate-900">{t("inputReviewTitle")}</h2>
-                  <p className="text-sm text-slate-500 mt-1">{t("inputReviewDesc")}</p>
-                </div>
+              <div className="flex rounded-3xl bg-slate-100 p-1.5 shadow-inner">
+                <button
+                  onClick={() => setSidebarTab("input")}
+                  className={cx(
+                    "flex flex-1 items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-semibold transition",
+                    sidebarTab === "input" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  )}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  {t("inputReviewTitle")}
+                </button>
+                <button
+                  onClick={() => setSidebarTab("history")}
+                  className={cx(
+                    "flex flex-1 items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-semibold transition",
+                    sidebarTab === "history" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  )}
+                >
+                  <Search className="h-4 w-4" />
+                  {t("historyTitle")}
+                  {history.length > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1.5 text-[10px] font-bold text-white">
+                      {history.length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {sidebarTab === "input" ? (
+                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="mb-6 flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900">{t("inputReviewTitle")}</h2>
+                      <p className="mt-1 text-sm text-slate-500">{t("inputReviewDesc")}</p>
+                    </div>
+                    <button
+                      onClick={saveToHistory}
+                      className="rounded-xl bg-slate-100 p-2 text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
+                      title={t("saveDesign")}
+                    >
+                      <ClipboardList className="h-5 w-5" />
+                    </button>
+                  </div>
 
                 <div className="space-y-5">
                   <Field
@@ -1251,6 +1346,52 @@ export default function HarnessEngineeringStudio() {
                   </div>
                 </div>
               </div>
+            ) : (
+                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="mb-6">
+                    <h2 className="text-lg font-bold text-slate-900">{t("historyTitle")}</h2>
+                    <p className="mt-1 text-sm text-slate-500">{t("noHistory")}</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {history.length === 0 ? (
+                      <div className="py-12 text-center">
+                        <Search className="mx-auto h-12 w-12 text-slate-200" />
+                        <div className="mt-4 text-sm text-slate-500 italic">{t("noHistory")}</div>
+                      </div>
+                    ) : (
+                      history.map((item) => (
+                        <div key={item.id} className="group rounded-2xl border border-slate-100 bg-slate-50 p-4 transition hover:border-slate-200">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-sm font-semibold text-slate-900">{item.name}</div>
+                              <div className="mt-1 text-[10px] text-slate-400">
+                                {new Date(item.timestamp).toLocaleString(language === "ja" ? "ja-JP" : language === "zh" ? "zh-CN" : "en-US")}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
+                              <button
+                                onClick={() => loadFromHistory(item)}
+                                className="rounded-lg bg-white p-2 text-slate-600 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 hover:text-slate-900"
+                                title={t("loadRecord")}
+                              >
+                                <Play className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => deleteFromHistory(item.id)}
+                                className="rounded-lg bg-white p-2 text-slate-600 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 hover:text-red-600"
+                                title={t("deleteRecord")}
+                              >
+                                <CircleDashed className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
