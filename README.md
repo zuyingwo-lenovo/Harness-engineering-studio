@@ -5,8 +5,10 @@ Harness Engineering Studio is a specialized IDE designed for building and refini
 ## Key Features
 
 - **Routine Builder**: Design sequential multi-loop problem-solving steps (Intake, Planning, Execution, Evaluation, Handoff).
-- **Harness Composer**: Select and configure state management, context loading, orchestration, and governance patterns.
-- **Artifact Workbench**: Generate and edit the markdown and JSON artifacts that the agent will use as its source of truth.
+- 🛠️ **Harness Composer**: Mix and match harness patterns (Artifact Registry, Tool Sandbox, Human Gate, etc.) to stabilize AI execution.
+- 🌍 **Multi-Language Support**: Seamlessly switch between **English, Chinese, and Japanese** with a floating UI switcher.
+- 💾 **State Persistence**: Remembers your inputs and last used language across sessions.
+- 📦 **Artifact Workbench**: Instant generation of `brief.md`, `plan.md`, `constraints.json`, and more.
 - **Dynamic Recommendations**: Automatically suggests the best combination of skills and harness patterns based on problem complexity and risk level.
 - **Execution Runbook**: Provides a clear map of the runtime loop and selected harness stack.
 
